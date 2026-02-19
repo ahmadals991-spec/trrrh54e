@@ -1,0 +1,216 @@
+:root {
+    --primary-color: #e74c3c;
+    --secondary-color: #c0392b;
+    --bg-color: #f4f6f7;
+    --text-color: #2c3e50;
+    --white: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    padding-bottom: 80px; /* مساحة لشريط التنقل السفلي */
+}
+
+/* شريط التنقل السفلي */
+.navbar {
+    background-color: var(--primary-color);
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.tabs button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-bottom: 3px solid transparent;
+    flex: 1;
+}
+
+.tabs button:hover {
+    color: var(--white);
+}
+
+.tabs button.active {
+    color: var(--white);
+    border-bottom: 3px solid var(--white);
+    transform: translateY(-3px);
+}
+
+/* الحاويات الرئيسية */
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    background: var(--white);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    display: none;
+}
+
+.container.active {
+    display: block;
+    animation: slideUpFade 0.5s ease-out;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* تصميم النماذج والحقول */
+.form-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex: 1;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.btn:hover { background-color: var(--secondary-color); }
+.btn-icon { font-size: 20px; font-weight: bold; padding: 10px 15px; }
+.btn-danger { background-color: #e74c3c; }
+.btn-edit { background-color: #f39c12; }
+
+/* الجداول */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: right;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+tr:hover { background-color: #f9f9f9; }
+
+.total-section {
+    text-align: left;
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+/* تصميم الفواتير في سجل المبيعات */
+.invoice-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: #fafafa;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+/* رسالة البداية المتحركة */
+.startup-msg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 9999;
+    animation: fadeOut 1s ease-in-out 3s forwards;
+    pointer-events: none;
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* التنبيهات المخصصة المتحركة */
+.custom-alert-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.custom-alert {
+    background-color: #34495e;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 16px;
+    text-align: center;
+    animation: slideDown 0.4s ease-out, fadeOutAlert 0.4s ease-in 2.6s forwards;
+}
+
+.custom-alert.error { background-color: #e74c3c; }
+.custom-alert.success { background-color: #2ecc71; }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOutAlert {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
