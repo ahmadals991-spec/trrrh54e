@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام المبيعات والمخزون</title>
+    <title>نظام الجرد وحساب الأرباح</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e74c3c">
@@ -16,65 +16,32 @@
 
     <div class="navbar">
         <div class="tabs">
-            <button class="active" onclick="switchTab('salesTab')">البيع المباشر</button>
-            <button onclick="switchTab('inventoryTab')">المخزون</button>
-            <button onclick="switchTab('historyTab')">سجل المبيعات</button>
+            <button class="active" onclick="switchTab('productsTab')">المنتجات</button>
+            <button onclick="switchTab('inventoryTab')">الجرد</button>
+            <button onclick="switchTab('profitsTab')">الأرباح</button>
             <button onclick="switchTab('settingsTab')">الإعدادات</button>
         </div>
     </div>
 
-    <div id="salesTab" class="container active">
-        <h3>تسجيل مبيعات جديدة</h3>
-        
-        <div class="form-group">
-            <input type="text" id="customerName" placeholder="اسم العميل (اختياري)">
-            <input type="tel" id="customerPhone" placeholder="رقم الهاتف (اختياري)">
-        </div>
-
-        <div class="form-group" style="align-items: center;">
-            <input list="itemList" id="searchItem" placeholder="ابحث عن سلعة (اكتب أول حرف)...">
-            <datalist id="itemList"></datalist>
-            
-            <input type="number" id="saleQty" placeholder="الكمية" value="1" min="1" style="flex: 0.5;">
-            <button class="btn btn-icon" onclick="addToCart()">+</button>
-        </div>
-
-        <table id="cartTable">
-            <thead>
-                <tr>
-                    <th>السلعة</th>
-                    <th>السعر</th>
-                    <th>الكمية</th>
-                    <th>الإجمالي</th>
-                    <th>إجراء</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <div class="total-section">
-            الإجمالي الكلي: <span id="grandTotal">0</span>
-        </div>
-        <button class="btn" style="width: 100%; margin-top: 20px;" onclick="checkout()">إتمام البيع</button>
-    </div>
-
-    <div id="inventoryTab" class="container">
-        <h3>إدارة السلع والمخزون</h3>
+    <div id="productsTab" class="container active">
+        <h3>إدارة المنتجات</h3>
         
         <div class="form-group" id="productForm">
             <input type="hidden" id="editIndex">
-            <input type="text" id="itemName" placeholder="اسم السلعة">
-            <input type="number" id="itemPrice" placeholder="سعر البيع">
-            <input type="number" id="itemQty" placeholder="الكمية المتوفرة">
-            <button class="btn" onclick="saveItem()" id="saveBtn">إضافة سلعة</button>
+            <input type="text" id="itemName" placeholder="اسم المنتج">
+            <input type="number" id="itemBuyPrice" placeholder="سعر الشراء">
+            <input type="number" id="itemSellPrice" placeholder="سعر البيع">
+            <input type="number" id="itemQty" placeholder="الكمية الأصلية">
+            <button class="btn" onclick="saveItem()" id="saveBtn">إضافة منتج</button>
         </div>
 
-        <table id="inventoryTable">
+        <table id="productsTable">
             <thead>
                 <tr>
-                    <th>اسم السلعة</th>
-                    <th>السعر</th>
-                    <th>الكمية المتوفرة</th>
+                    <th>المنتج</th>
+                    <th>الشراء</th>
+                    <th>البيع</th>
+                    <th>الكمية</th>
                     <th>إجراءات</th>
                 </tr>
             </thead>
@@ -82,16 +49,35 @@
         </table>
     </div>
 
-    <div id="historyTab" class="container">
-        <h3>سجل المبيعات</h3>
-        <div class="total-section" style="margin-bottom: 20px; text-align: center; background: #fdf2e9; padding: 15px; border-radius: 8px;">
-            إجمالي مبيعات اليوم: <span id="todayTotal">0</span>
-        </div>
+    <div id="inventoryTab" class="container">
+        <h3>الجرد الفعلي</h3>
         
-        <div id="salesHistoryContainer">
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>الأصلية</th>
+                    <th>المتبقية</th>
+                    <th>المباعة</th>
+                    <th>الربح</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="total-section">
+            مجموع الأرباح الحالية: <span id="currentTotalProfit">0</span>
+        </div>
+    </div>
+
+    <div id="profitsTab" class="container">
+        <h3>الأرباح السابقة</h3>
+        
+        <button class="btn btn-edit" style="width: 100%; margin-bottom: 20px; background-color: #2ecc71;" onclick="resetMonth()">تصفير الشهر وبدء جرد جديد (حفظ الأرباح)</button>
+        
+        <div id="profitsHistoryContainer">
             </div>
 
-        <button class="btn btn-danger" style="width: 100%; margin-top: 30px;" onclick="resetAllData()">تصفير جميع الحسابات والمخزون</button>
+        <button class="btn btn-danger" style="width: 100%; margin-top: 30px;" onclick="resetAllData()">تصفير جميع الحسابات والجرد نهائياً</button>
     </div>
 
     <div id="settingsTab" class="container">
