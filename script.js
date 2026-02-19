@@ -1,5 +1,6 @@
 // إعدادات Firebase كما طلبت
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBQ9R33BlgaK-TXhnvIqFvSebpROzR9Ewk",
@@ -10,11 +11,42 @@ const firebaseConfig = {
     appId: "1:637429957373:web:a5a4335851c922b6fc7494"
 };
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // مصفوفات لتخزين البيانات محلياً
 let inventory = JSON.parse(localStorage.getItem('myInventory')) || [];
 let salesHistory = JSON.parse(localStorage.getItem('mySalesHistory')) || [];
 let cart = [];
+
+// دوال المزامنة مع Firebase
+async function syncToFirebase() {
+    try {
+        await setDoc(doc(db, "data", "inventory"), { items: inventory });
+        await setDoc(doc(db, "data", "salesHistory"), { items: salesHistory });
+    } catch (error) {
+        console.log("خطأ في المزامنة مع فايربيز:", error);
+    }
+}
+
+async function loadFromFirebase() {
+    try {
+        const invDoc = await getDoc(doc(db, "data", "inventory"));
+        if (invDoc.exists()) {
+            inventory = invDoc.data().items || [];
+            localStorage.setItem('myInventory', JSON.stringify(inventory));
+        }
+        const salesDoc = await getDoc(doc(db, "data", "salesHistory"));
+        if (salesDoc.exists()) {
+            salesHistory = salesDoc.data().items || [];
+            localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
+        }
+        renderInventory();
+        renderHistory();
+        updateDatalist();
+    } catch (error) {
+        console.log("تعذر جلب البيانات من فايربيز (ربما تعمل أوفلاين):", error);
+    }
+}
 
 // دالة تنسيق العملة (الدينار العراقي)
 function formatCurrency(amount) {
@@ -68,6 +100,8 @@ window.saveItem = function() {
     }
 
     localStorage.setItem('myInventory', JSON.stringify(inventory));
+    syncToFirebase();
+    
     clearProductForm();
     renderInventory();
     updateDatalist();
@@ -101,6 +135,8 @@ window.deleteItem = function(index) {
     if(confirm("هل أنت متأكد من حذف هذه السلعة؟")) {
         inventory.splice(index, 1);
         localStorage.setItem('myInventory', JSON.stringify(inventory));
+        syncToFirebase();
+        
         renderInventory();
         updateDatalist();
         showCustomAlert("تم الحذف بنجاح", "success");
@@ -215,8 +251,10 @@ window.checkout = function() {
         total: grandTotal
     };
     salesHistory.push(invoice);
+    
     localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
     localStorage.setItem('myInventory', JSON.stringify(inventory));
+    syncToFirebase();
     
     showCustomAlert("تم إتمام عملية البيع بنجاح!", "success");
     
@@ -273,6 +311,8 @@ window.deleteInvoice = function(index) {
     if(pass === "1001") {
         salesHistory.splice(index, 1);
         localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
+        syncToFirebase();
+        
         renderHistory();
         showCustomAlert("تم حذف الفاتورة", "success");
     } else if (pass !== null) {
@@ -287,6 +327,8 @@ window.resetAllData = function() {
         localStorage.removeItem('mySalesHistory');
         inventory = [];
         salesHistory = [];
+        syncToFirebase();
+        
         renderInventory();
         renderHistory();
         updateDatalist();
@@ -325,6 +367,8 @@ window.restoreData = function(event) {
                 localStorage.setItem('mySalesHistory', JSON.stringify(data.salesHistory));
                 inventory = data.inventory;
                 salesHistory = data.salesHistory;
+                syncToFirebase();
+                
                 renderInventory();
                 renderHistory();
                 updateDatalist();
@@ -342,3 +386,4 @@ window.restoreData = function(event) {
 // تهيئة النظام عند التحميل
 renderInventory();
 updateDatalist();
+loadFromFirebase();
