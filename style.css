@@ -1,9 +1,11 @@
 :root {
     --primary-color: #e74c3c;
     --secondary-color: #c0392b;
-    --bg-color: #f4f6f7;
+    --bg-color: #f0f4f8;
     --text-color: #2c3e50;
     --white: #ffffff;
+    --input-bg: #f8fafc;
+    --input-border: #cbd5e1;
 }
 
 body {
@@ -12,7 +14,7 @@ body {
     color: var(--text-color);
     margin: 0;
     padding: 0;
-    padding-bottom: 80px; /* مساحة لشريط التنقل السفلي */
+    padding-bottom: 80px;
 }
 
 /* شريط التنقل السفلي */
@@ -23,7 +25,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
     z-index: 1000;
 }
 
@@ -37,17 +39,19 @@ body {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.7);
-    padding: 10px;
+    padding: 12px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     border-bottom: 3px solid transparent;
     flex: 1;
+    border-radius: 8px 8px 0 0;
 }
 
 .tabs button:hover {
     color: var(--white);
+    background-color: rgba(255,255,255,0.1);
 }
 
 .tabs button.active {
@@ -59,12 +63,21 @@ body {
 /* الحاويات الرئيسية */
 .container {
     max-width: 1000px;
-    margin: 20px auto;
+    margin: 30px auto;
     background: var(--white);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
     display: none;
+    border: 1px solid #e2e8f0;
+}
+
+.container h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: var(--primary-color);
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 10px;
 }
 
 .container.active {
@@ -81,83 +94,102 @@ body {
 .form-group {
     display: flex;
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     flex-wrap: wrap;
 }
 
 input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 2px solid var(--input-border);
+    border-radius: 10px;
     flex: 1;
     font-size: 15px;
+    background-color: var(--input-bg);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
 
 input:focus {
     outline: none;
     border-color: var(--primary-color);
+    background-color: var(--white);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15);
 }
 
 .btn {
     background-color: var(--primary-color);
     color: var(--white);
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 12px 20px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
-    transition: 0.3s;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2);
 }
 
-.btn:hover { background-color: var(--secondary-color); }
-.btn-icon { font-size: 20px; font-weight: bold; padding: 10px 15px; }
-.btn-danger { background-color: #e74c3c; }
-.btn-edit { background-color: #f39c12; }
+.btn:hover { 
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-danger { background-color: #e74c3c; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.2); }
+.btn-danger:hover { background-color: #c0392b; box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3); }
+
+.btn-edit { background-color: #f39c12; box-shadow: 0 4px 6px rgba(243, 156, 18, 0.2); }
+.btn-edit:hover { background-color: #e67e22; box-shadow: 0 6px 12px rgba(243, 156, 18, 0.3); }
 
 /* الجداول */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 th, td {
-    padding: 12px;
+    padding: 15px 12px;
     text-align: right;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 th {
     background-color: var(--primary-color);
     color: var(--white);
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
-tr:hover { background-color: #f9f9f9; }
+tbody tr {
+    background-color: var(--white);
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover { background-color: #f8fafc; }
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
 
 .total-section {
     text-align: left;
-    margin-top: 20px;
-    font-size: 22px;
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 10px;
+    font-size: 20px;
     font-weight: bold;
     color: var(--secondary-color);
-}
-
-/* تصميم الفواتير في سجل المبيعات */
-.invoice-card {
-    border: 1px solid #eee;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    background: #fafafa;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-}
-.invoice-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
 }
 
 /* رسالة البداية المتحركة */
@@ -196,9 +228,10 @@ tr:hover { background-color: #f9f9f9; }
     background-color: #34495e;
     color: white;
     padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     font-size: 16px;
+    font-weight: 600;
     text-align: center;
     animation: slideDown 0.4s ease-out, fadeOutAlert 0.4s ease-in 2.6s forwards;
 }
