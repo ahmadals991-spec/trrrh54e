@@ -18,7 +18,6 @@
         <div class="tabs">
             <button class="active" onclick="switchTab('productsTab')">المنتجات</button>
             <button onclick="switchTab('inventoryTab')">الجرد</button>
-            <button onclick="switchTab('profitsTab')">الأرباح</button>
             <button onclick="switchTab('settingsTab')">الإعدادات</button>
         </div>
     </div>
@@ -47,6 +46,10 @@
             </thead>
             <tbody></tbody>
         </table>
+
+        <div class="total-section">
+            مجموع الشراء الكلي: <span id="totalBuyPrice">0</span>
+        </div>
     </div>
 
     <div id="inventoryTab" class="container">
@@ -67,19 +70,6 @@
         <div class="total-section">
             مجموع الأرباح الحالية: <span id="currentTotalProfit">0</span>
         </div>
-        
-        <button class="btn btn-edit" style="width: 100%; margin-top: 20px; background-color: #2ecc71;" onclick="resetMonth()">حفظ وجمع الأرباح الحالية</button>
-    </div>
-
-    <div id="profitsTab" class="container">
-        <h3>الأرباح السابقة</h3>
-        
-        <button class="btn btn-edit" style="width: 100%; margin-bottom: 20px; background-color: #2ecc71;" onclick="resetMonth()">تصفير الشهر وبدء جرد جديد (حفظ الأرباح)</button>
-        
-        <div id="profitsHistoryContainer">
-            </div>
-
-        <button class="btn btn-danger" style="width: 100%; margin-top: 30px;" onclick="resetAllData()">تصفير جميع الحسابات والجرد نهائياً</button>
     </div>
 
     <div id="settingsTab" class="container">
@@ -91,6 +81,8 @@
                 رفع نسخة احتياطية
                 <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreData(event)">
             </label>
+
+            <button class="btn btn-danger" onclick="resetAllData()">تصفير جميع الحسابات والجرد نهائياً</button>
 
             <a href="https://t.me/am_an12" target="_blank" class="btn" style="background-color: #3498db; text-align: center; text-decoration: none;">المطور والتحديثات عبر التلغرام @am_an12</a>
         </div>
