@@ -15,13 +15,11 @@ const db = getFirestore(app);
 
 // مصفوفات لتخزين البيانات محلياً
 let inventory = JSON.parse(localStorage.getItem('myInventory')) || [];
-let profitsHistory = JSON.parse(localStorage.getItem('myProfitsHistory')) || [];
 
 // دوال المزامنة مع Firebase
 async function syncToFirebase() {
     try {
         await setDoc(doc(db, "data", "inventory"), { items: inventory });
-        await setDoc(doc(db, "data", "profitsHistory"), { items: profitsHistory });
     } catch (error) {
         console.log("خطأ في المزامنة مع فايربيز:", error);
     }
@@ -33,11 +31,6 @@ async function loadFromFirebase() {
         if (invDoc.exists()) {
             inventory = invDoc.data().items || [];
             localStorage.setItem('myInventory', JSON.stringify(inventory));
-        }
-        const profitsDoc = await getDoc(doc(db, "data", "profitsHistory"));
-        if (profitsDoc.exists()) {
-            profitsHistory = profitsDoc.data().items || [];
-            localStorage.setItem('myProfitsHistory', JSON.stringify(profitsHistory));
         }
         renderAll();
     } catch (error) {
@@ -71,13 +64,11 @@ window.switchTab = function(tabId) {
     event.target.classList.add('active');
     
     if(tabId === 'inventoryTab') renderInventory();
-    if(tabId === 'profitsTab') renderProfits();
 };
 
 function renderAll() {
     renderProducts();
     renderInventory();
-    renderProfits();
 }
 
 // --- قسم المنتجات ---
@@ -125,7 +116,12 @@ window.renderProducts = function() {
     let tbody = document.querySelector('#productsTable tbody');
     if(!tbody) return;
     tbody.innerHTML = '';
+    
+    let totalBuyAmount = 0;
+
     inventory.forEach((item, index) => {
+        totalBuyAmount += ((item.buyPrice || 0) * (item.qty || 0));
+
         tbody.innerHTML += `
             <tr>
                 <td>${item.name}</td>
@@ -133,12 +129,17 @@ window.renderProducts = function() {
                 <td>${formatCurrency(item.sellPrice || 0)}</td>
                 <td>${item.qty}</td>
                 <td>
-                    <button class="btn btn-edit" style="padding: 5px 10px; font-size: 14px; margin-bottom: 5px;" onclick="editItem(${index})">تعديل</button>
-                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 14px;" onclick="deleteItem(${index})">حذف</button>
+                    <button class="btn btn-edit" style="padding: 6px 12px; font-size: 13px; margin-bottom: 5px; border-radius: 6px;" onclick="editItem(${index})">تعديل</button>
+                    <button class="btn btn-danger" style="padding: 6px 12px; font-size: 13px; border-radius: 6px;" onclick="deleteItem(${index})">حذف</button>
                 </td>
             </tr>
         `;
     });
+
+    let totalBuyPriceElement = document.getElementById('totalBuyPrice');
+    if(totalBuyPriceElement) {
+        totalBuyPriceElement.innerText = formatCurrency(totalBuyAmount);
+    }
 };
 
 window.editItem = function(index) {
@@ -184,7 +185,7 @@ window.renderInventory = function() {
                 <td>
                     <input type="number" min="0" max="${item.qty}" value="${item.remQty}" 
                         oninput="updateRemQty(${index}, this.value)"
-                        style="width: 70px; padding: 5px; text-align: center;">
+                        style="width: 70px; padding: 8px; text-align: center; box-shadow: none;">
                 </td>
                 <td id="soldQty-${index}">${soldQty}</td>
                 <td id="profit-${index}" style="color: var(--secondary-color); font-weight: bold;">${formatCurrency(profit)}</td>
@@ -223,84 +224,11 @@ window.updateRemQty = function(index, value) {
     syncToFirebase();
 };
 
-// --- قسم الأرباح ---
-window.renderProfits = function() {
-    let container = document.getElementById('profitsHistoryContainer');
-    if(!container) return;
-    container.innerHTML = '';
-
-    // عكس المصفوفة لعرض الأحدث أولاً
-    let reversedHistory = [...profitsHistory].reverse();
-
-    reversedHistory.forEach((record, reversedIndex) => {
-        let originalIndex = profitsHistory.length - 1 - reversedIndex;
-        container.innerHTML += `
-            <div class="invoice-card" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>تاريخ الجرد: ${record.date}</strong><br>
-                    <span style="color: var(--secondary-color); font-weight: bold; font-size: 18px;">
-                        إجمالي الربح: ${formatCurrency(record.profit)}
-                    </span>
-                </div>
-                <button class="btn btn-danger" style="padding: 5px 10px; font-size: 14px;" onclick="deleteProfit(${originalIndex})">حذف</button>
-            </div>
-        `;
-    });
-};
-
-window.resetMonth = function() {
-    if(confirm("هل أنت متأكد من تصفير الشهر؟ سيتم حفظ الأرباح الحالية، واعتبار الكمية المتبقية هي الكمية الأصلية الجديدة للمنتجات.")) {
-        
-        let totalProfit = 0;
-        inventory.forEach(item => {
-            let soldQty = item.qty - (item.remQty !== undefined ? item.remQty : item.qty);
-            let unitProfit = (item.sellPrice || 0) - (item.buyPrice || 0);
-            totalProfit += (soldQty * unitProfit);
-        });
-
-        // حفظ سجل الأرباح
-        profitsHistory.push({
-            date: new Date().toLocaleDateString('en-GB') + ' ' + new Date().toLocaleTimeString(),
-            profit: totalProfit
-        });
-
-        // تصفير الجرد (الكمية الأصلية الجديدة = الكمية المتبقية السابقة)
-        inventory.forEach(item => {
-            if(item.remQty !== undefined) {
-                item.qty = item.remQty;
-            }
-        });
-
-        localStorage.setItem('myProfitsHistory', JSON.stringify(profitsHistory));
-        localStorage.setItem('myInventory', JSON.stringify(inventory));
-        syncToFirebase();
-        
-        renderAll();
-        showCustomAlert("تم تصفير الشهر وحفظ الأرباح بنجاح!", "success");
-    }
-};
-
-window.deleteProfit = function(index) {
-    let pass = prompt("الرجاء إدخال رمز الحذف:");
-    if(pass === "1001") {
-        profitsHistory.splice(index, 1);
-        localStorage.setItem('myProfitsHistory', JSON.stringify(profitsHistory));
-        syncToFirebase();
-        
-        renderProfits();
-        showCustomAlert("تم حذف السجل بنجاح", "success");
-    } else if (pass !== null) {
-        showCustomAlert("الرمز خاطئ!");
-    }
-};
-
 window.resetAllData = function() {
     let pass = prompt("الرجاء إدخال رمز تصفير الحسابات (سيتم مسح كل شيء نهائياً):");
     if(pass === "1001") {
         localStorage.removeItem('myInventory');
-        localStorage.removeItem('myProfitsHistory');
         inventory = [];
-        profitsHistory = [];
         syncToFirebase();
         
         renderAll();
@@ -313,8 +241,7 @@ window.resetAllData = function() {
 // --- قسم الإعدادات (النسخ الاحتياطي) ---
 window.backupData = function() {
     let data = {
-        inventory: inventory,
-        profitsHistory: profitsHistory
+        inventory: inventory
     };
     let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
     let downloadAnchorNode = document.createElement('a');
@@ -334,11 +261,9 @@ window.restoreData = function(event) {
     reader.onload = function(e) {
         try {
             let data = JSON.parse(e.target.result);
-            if(data.inventory && data.profitsHistory !== undefined) {
+            if(data.inventory) {
                 localStorage.setItem('myInventory', JSON.stringify(data.inventory));
-                localStorage.setItem('myProfitsHistory', JSON.stringify(data.profitsHistory));
                 inventory = data.inventory;
-                profitsHistory = data.profitsHistory;
                 syncToFirebase();
                 
                 renderAll();
